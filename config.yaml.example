@@ -1,0 +1,82 @@
+# Network Configuration Drift Detector Configuration
+
+# Device credentials (can be overridden per device)
+credentials:
+  username: "admin"
+  password: "password"
+  # ssh_key: "/path/to/ssh/key"  # Optional SSH key authentication
+
+# Devices to monitor for configuration drift
+devices:
+  - hostname: "core-router-01"
+    ip: "192.168.1.1"
+    device_type: "cisco_ios"
+    baseline: "baselines/core-router-template.txt"
+    # username: "device_specific_user"  # Optional device-specific credentials
+    # password: "device_specific_pass"
+    # timeout: 60
+    
+  - hostname: "core-switch-01"
+    ip: "192.168.1.10"
+    device_type: "cisco_ios"
+    baseline: "baselines/core-switch-template.txt"
+    
+  - hostname: "firewall-01"
+    ip: "192.168.1.254"
+    device_type: "cisco_asa"
+    baseline: "baselines/firewall-template.txt"
+    
+  - hostname: "juniper-router-01"
+    ip: "192.168.2.1"
+    device_type: "juniper_junos"
+    baseline: "baselines/juniper-template.txt"
+    config_command: "show configuration"
+
+# Configuration filtering options
+filtering:
+  ignore_patterns:
+    - "^! Last configuration change at.*"
+    - "^!Time:.*"
+    - "^! NVRAM config last updated.*"
+    - "^.*uptime is.*"
+    - "^.*System image file is.*"
+    - "^.*bytes of.*memory.*"
+    - "^.*Current configuration.*bytes.*"
+    - "^Building configuration.*"
+    - "^interface.*line protocol is.*"
+    - "^.*packets input.*packets output.*"
+    - "^.*input rate.*output rate.*"
+
+# Notification settings
+notifications:
+  email:
+    enabled: true
+    smtp_server: "smtp.company.com"
+    smtp_port: 587
+    use_tls: true
+    username: "drift-alerts@company.com"
+    password: "smtp_password"
+    sender: "drift-detector@company.com"
+    recipients:
+      - "netops@company.com"
+      - "security@company.com"
+    send_on_no_drift: false  # Send email even when no drift detected
+    
+  webhook:
+    enabled: true
+    url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    # Alternative webhook examples:
+    # url: "https://your-itsm-system.com/api/alerts"
+    # url: "https://your-monitoring-system.com/webhooks/drift"
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "drift_detector.log"
+
+# Advanced settings
+settings:
+  max_workers: 5  # Number of concurrent device connections
+  connection_timeout: 30  # Seconds
+  retry_attempts: 2
+  retry_delay: 5  # Seconds between retries
